@@ -8,7 +8,6 @@ from tqdm import tqdm
 
 from .pipeline import OutlineConfig, convert_bytes_to_outline_png
 
-
 SUPPORTED = {".png", ".jpg", ".jpeg", ".webp"}
 
 
@@ -17,19 +16,22 @@ def parse_args() -> argparse.Namespace:
         prog="outline-only",
         description="Convert images to outline-only line art (silhouette + optional occlusion lines).",
     )
+
     p.add_argument("input", type=str, help="Input file or folder")
     p.add_argument("-o", "--output", type=str, default="out", help="Output file or folder")
-    p.add_argument("--no-occlusion", action="store_true", help="Disable inner/occlusion lines (silhouette only)")
+
+    p.add_argument("--no-occlusion", action="store_true", help="Disable inner/occlusion lines")
 
     p.add_argument("--sil-thick", type=int, default=4, help="Silhouette thickness")
     p.add_argument("--in-thick", type=int, default=1, help="Inner line thickness")
 
-    p.add_argument("--eps", type=float, default=0.003, help="Silhouette simplify epsilon ratio (bigger = simpler)")
-    p.add_argument("--canny1", type=int, default=80, help="Canny threshold1")
-    p.add_argument("--canny2", type=int, default=160, help="Canny threshold2")
-    p.add_argument("--inner-min", type=float, default=0.003, help="Min inner contour area ratio")
-    p.add_argument("--alpha-th", type=int, default=10, help="Alpha threshold for mask")
-    p.add_argument("--morph", type=int, default=5, help="Morph kernel size (odd recommended)")
+    p.add_argument("--eps", type=float, default=0.003, help="Silhouette simplify epsilon ratio")
+    p.add_argument("--canny1", type=int, default=80)
+    p.add_argument("--canny2", type=int, default=160)
+    p.add_argument("--inner-min", type=float, default=0.006)
+    p.add_argument("--alpha-th", type=int, default=10)
+    p.add_argument("--morph", type=int, default=5)
+
     return p.parse_args()
 
 
@@ -63,9 +65,8 @@ def main() -> None:
     if not imgs:
         raise SystemExit("No images found.")
 
-    # Output path handling
+    # single file
     if in_path.is_file():
-        # output is file (if ends with .png) else treat as folder
         if out_path.suffix.lower() == ".png":
             out_file = out_path
         else:
@@ -74,26 +75,25 @@ def main() -> None:
 
         with open(in_path, "rb") as f:
             b = f.read()
+
         out = convert_bytes_to_outline_png(b, cfg)
         cv2.imwrite(str(out_file), out)
         print(f"Saved: {out_file}")
         return
 
-    # folder mode
+    # folder batch
     out_path.mkdir(parents=True, exist_ok=True)
     for img_path in tqdm(imgs, desc="Converting"):
         rel = img_path.relative_to(in_path)
-        # keep subfolders, output png
-        target_dir = (out_path / rel.parent)
+        target_dir = out_path / rel.parent
         target_dir.mkdir(parents=True, exist_ok=True)
+
         out_file = target_dir / (img_path.stem + "_outline.png")
 
         with open(img_path, "rb") as f:
             b = f.read()
+
         out = convert_bytes_to_outline_png(b, cfg)
-        cv2.imwrite(str(out_file), out)
+        cv2.imwrite(str(out_file)_
 
-    print(f"Done. Outputs in: {out_path}")
-
-p.add_argument("--debug", action="store_true", help="Save intermediate debug images")
 
