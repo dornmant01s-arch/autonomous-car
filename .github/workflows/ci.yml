@@ -42,3 +42,6 @@ jobs:
         with:
           name: outline-output-${{ matrix.python-version }}
           path: out/outline.png
+
+          on:
+  workflow_dispatch:
