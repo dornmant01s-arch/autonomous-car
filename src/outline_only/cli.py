@@ -94,6 +94,7 @@ def main() -> None:
             b = f.read()
 
         out = convert_bytes_to_outline_png(b, cfg)
-        cv2.imwrite(str(out_file)_
+        cv2.imwrite(str(out_file), out)
+
 
 
