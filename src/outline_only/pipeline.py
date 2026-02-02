@@ -96,11 +96,14 @@ def extract_inner_contours(
 
     inner, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
     min_area = area * float(cfg.inner_min_area_ratio)
-    inners = [for c in inner:
+   inners = []
+for c in inner:
     a = cv2.contourArea(c)
     L = cv2.arcLength(c, False)
-    if a >= min_area and L >= 0.02 * (h + w):  # 길이도 기준
-        inners.append(c)]
+
+    # 면적 + 길이 둘 다 기준으로 필터 (잡선 제거)
+    if a >= min_area and L >= 0.02 * (h + w):
+        inners.append(c)
     
     return inners
 
@@ -139,4 +142,5 @@ def convert_bytes_to_outline_png(image_bytes: bytes, cfg: OutlineConfig) -> np.n
     inner = extract_inner_contours(rgba, mask, cfg) if cfg.use_occlusion_lines else []
     out = render_outline_png(mask, main, inner, cfg)
     return out
+
 
