@@ -94,3 +94,6 @@ def main() -> None:
         cv2.imwrite(str(out_file), out)
 
     print(f"Done. Outputs in: {out_path}")
+
+p.add_argument("--debug", action="store_true", help="Save intermediate debug images")
+
