@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "outline-only"
+version = "0.1.0"
+description = "Outline-only line art converter with depth cues (silhouette + occlusion lines)."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "opencv-python>=4.8",
+  "numpy>=1.24",
+  "pillow>=10.0",
+  "rembg>=2.0.57",
+  "onnxruntime>=1.16.0",
+  "tqdm>=4.66"
+]
+
+[project.scripts]
+outline-only = "outline_only.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
